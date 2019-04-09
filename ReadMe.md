@@ -4,3 +4,9 @@
 
 [Package EventBus is the little and lightweight eventbus with async compatibility for GoLang.](https://github.com/asaskevich/EventBus)
 
+[evio](https://github.com/tidwall/evio)
+
+---------------------------
+
+Simple event bus with custom http parser which can fit my graduation projects demand.
+
