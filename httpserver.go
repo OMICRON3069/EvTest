@@ -1,4 +1,4 @@
-package httpServer
+package main
 
 import (
 	"fmt"
@@ -16,7 +16,6 @@ type request struct {
 	remoteAddr    string
 }
 
-/*
 func main() {
 	ln, err := net.Listen("tcp", "127.0.0.1:666")
 	fmt.Println("Listening on: " + ln.Addr().String())
@@ -34,8 +33,6 @@ func main() {
 	}
 }
 
-
- */
 func Sucker(c net.Conn) {
 	var out []byte
 	//is := c.Context().(*InputStream)
