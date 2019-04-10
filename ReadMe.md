@@ -8,5 +8,5 @@
 
 ---------------------------
 
-Simple event bus with custom http parser which can fit my graduation project demand.
+Simple event bus framework with custom http parser which can fit my graduation project demands.
 
