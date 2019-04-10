@@ -11,13 +11,13 @@ type TheError struct {
 	Detail  interface{} //using Detail to trace stack.
 }
 
-//Error conditions for event bus
 var (
+	//Error conditions for event bus
 	NotDataCode uint16 = 1
 	NotData            = "interface is function"
 )
 
 //TODO: finish stack trace
 func (e *TheError) Error() string {
-	return fmt.Sprintf("At function %v, Error code %v: %s", e.Detail, e.Code, e.Message)
+	return fmt.Sprintf("Error code %v: %s", e.Code, e.Message)
 }
