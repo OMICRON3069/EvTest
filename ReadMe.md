@@ -8,5 +8,6 @@
 
 ---------------------------
 
-Simple event bus framework with custom http parser which can fit my graduation project demands.
+Simple event bus framework with ~~custom http parser~~ which can fit my graduation project demands.
 
+Shit, I can just use [WebSocket](https://github.com/gorilla/websocket) to achieve async and non-blocking network communication.
