@@ -62,8 +62,8 @@ func (bus *Bus) Publish(topic string, data interface{}) error {
 			//use a separate routine to callback
 			go func(data Event, contacts []SubQueue) {
 				for _, contact := range contacts {
-					contact.Messenger <- data
 					go contact.Holder(contact.Messenger)
+					contact.Messenger <- data
 				}
 			}(Event{Data: data, Topic: topic}, contacts)
 		}

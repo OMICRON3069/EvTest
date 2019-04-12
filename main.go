@@ -19,9 +19,8 @@ func main() {
 	theFirstBus.SubScribe("http:sb", ch1, printDataEvent)
 	theFirstBus.SubScribe("http:dsb", ch2, printDataEvent)
 	theFirstBus.SubScribe("http:dsb", ch3, printDataEvent)
-	fmt.Println("??")
 	go func(topic string, data string) {
-		fmt.Println("start this")
+		fmt.Println("start 1")
 		for {
 			_ = theFirstBus.Publish(topic, data)
 			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
@@ -29,6 +28,7 @@ func main() {
 	}("http:sb", "Hi, Topic1")
 
 	go func(topic string, data string) {
+		fmt.Println("start 2")
 		for {
 			_ = theFirstBus.Publish(topic, data)
 			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
@@ -39,6 +39,7 @@ func main() {
 }
 
 func printDataEvent(ch evBus.EventChannel) {
+	fmt.Println("calling")
 	data := <-ch
 	fmt.Printf("Topic: %s; DataEvent: %v\n", data.Topic, data.Data)
 }
