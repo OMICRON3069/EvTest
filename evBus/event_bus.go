@@ -62,6 +62,7 @@ func (bus *Bus) Publish(topic string, data interface{}) error {
 			//use a separate routine to callback
 			go func(data Event, contacts []SubQueue) {
 				for _, contact := range contacts {
+					//TODO:check if channel closed
 					go contact.Holder(contact.Messenger)
 					contact.Messenger <- data
 				}
