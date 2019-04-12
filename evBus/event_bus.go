@@ -11,38 +11,40 @@ import (
 type Event struct {
 	Data  interface{}
 	Topic string
-	ID    uint64
 }
 
 type EventChannel chan Event
 
 type Bus struct {
-	subscriber map[string][]EventChannel
+	subscriber map[string][]SubQueue
 	sync.RWMutex
 }
 
 type SubQueue struct {
-	//TODO: loop this queue to receive callback
-	//maybe that's not the most effective solution
-	//see https://stackoverflow.com/questions/3398490/checking-if-a-channel-has-a-ready-to-read-value-using-go
-	//and https://stackoverflow.com/questions/19992334/how-to-listen-to-n-channels-dynamic-select-statement
+	Holder func(ch EventChannel)
+	Messenger EventChannel
 }
 
-func (b *Bus) SubScribe(topic string, ch EventChannel) {
-	b.Lock()
-	if pre, found := b.subscriber[topic]; found {
-		b.subscriber[topic] = append(pre, ch)
+
+func (bus *Bus) SubScribe(topic string, ch EventChannel, holder func(ch EventChannel)) {
+	bus.Lock()
+	defer bus.Unlock()
+	if pre, found := bus.subscriber[topic]; found {
+		bus.subscriber[topic] = append(pre,SubQueue{holder,ch})
 	} else {
-		b.subscriber[topic] = append([]EventChannel{}, ch)
+		bus.subscriber[topic] = append([]SubQueue{}, SubQueue{holder,ch})
 	}
-	b.Unlock()
+}
+
+func (bus *Bus)UnSubscribe(topic string, ch EventChannel, holder func())  {
+	//TODO
 }
 
 //This method will publish data to specific topic
 //and it will return error if data interface is not data type
-func (b *Bus) Publish(topic string, data interface{}) error {
-	b.RLock()
-	defer b.RUnlock()
+func (bus *Bus) Publish(topic string, data interface{}) error {
+	bus.RLock()
+	defer bus.RUnlock()
 
 	//checking type of data
 	if reflect.TypeOf(data).Kind() == reflect.Func {
@@ -54,22 +56,24 @@ func (b *Bus) Publish(topic string, data interface{}) error {
 		}
 	} else {
 		//if this topic has subscriber
-		if ch, found := b.subscriber[topic]; found {
+		if contact, found := bus.subscriber[topic]; found {
 			//create a new slice here to be passed to func
-			chs := append([]EventChannel{}, ch...)
+			contacts := append([]SubQueue{}, contact...)
 			//use a separate routine to callback
-			go func(data Event, chs []EventChannel) {
-				for _, ch := range chs {
-					ch <- data
+			go func(data Event, contacts []SubQueue) {
+				for _, contact := range contacts {
+					go contact.Holder(contact.Messenger)
+					contact.Messenger <- data
 				}
-			}(Event{Data: data, Topic: topic}, chs)
+			}(Event{Data: data, Topic: topic}, contacts)
 		}
 	} //TODO: what if there is no subscriber?
 	return nil
 }
 
+//maybe I need a better way to create a new bus
 func New() *Bus {
 	return &Bus{
-		subscriber: make(map[string][]EventChannel),
+		subscriber: make(map[string][]SubQueue),
 	}
 }
