@@ -3,8 +3,8 @@ package main
 import (
 	"EvTest/evBus"
 	"fmt"
+	"log"
 	"math/rand"
-	"reflect"
 	"sync"
 	"time"
 )
@@ -17,17 +17,16 @@ func main() {
 	var (
 		wg sync.WaitGroup
 	)
-	ch1 := make(chan evBus.Event)
-	ch2 := make(chan evBus.Event)
-	ch3 := make(chan evBus.Event)
 
-	theFirstBus.SubScribe("http:sb", ch1, printDataEvent)
-	theFirstBus.SubScribe("http:dsb", ch2, printDataEvent)
-	theFirstBus.SubScribe("http:dsb", ch3, printDataEvent)
+	theFirstBus.Subscribe("http:sb", printDataEvent)
+	theFirstBus.Subscribe("http:dsb",printDataEvent)
+	theFirstBus.Subscribe("http:dsb", printDataEvent)
+
 	wg.Add(1)
 	go func(topic string, data string) {
+		log.Println("start 1")
 		for {
-			_ = theFirstBus.Publish(topic, data)
+			theFirstBus.Publish(topic, data)
 			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 		}
 		//wg.Done()
@@ -35,8 +34,9 @@ func main() {
 
 	wg.Add(1)
 	go func(topic string, data string) {
+		log.Println("start 2")
 		for {
-			_ = theFirstBus.Publish(topic, data)
+			theFirstBus.Publish(topic, data)
 			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 		}
 		//wg.Done()
@@ -44,6 +44,6 @@ func main() {
 	wg.Wait()
 }
 
-func printDataEvent(ch reflect.Value) {
-	fmt.Printf("Topic: %s; DataEvent: %v\n", ch.FieldByName("Topic"), ch.FieldByName("Data"))
+func printDataEvent(data string) {
+	fmt.Println(data)
 }
