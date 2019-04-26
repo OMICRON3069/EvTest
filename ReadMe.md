@@ -9,5 +9,3 @@
 ---------------------------
 
 Simple event bus framework with ~~custom http parser~~ which can meet my graduation project's demands.
-
-Shit, I can just use [WebSocket](https://github.com/gobwas/ws) to achieve async and non-blocking network communication.
